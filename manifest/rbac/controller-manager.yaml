@@ -6,6 +6,13 @@ metadata:
   namespace: linode-system
 rules:
 - apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
   - linode.com
   resources:
   - instances

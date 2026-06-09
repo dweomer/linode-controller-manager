@@ -6,21 +6,19 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
-
-	"github.com/linode/linodego/v2"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/dweomer/linode-controller-manager/api/v1alpha1"
-)
-
-var (
-	_ linodego.Instance
 )
 
 // InstanceReconciler reconciles an Instance object
 type InstanceReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	Events <-chan event.GenericEvent
 }
 
 // +kubebuilder:rbac:groups=linode.com,namespace=linode-system,resources=instances,verbs=get;list;watch;create;update;patch;delete
@@ -37,8 +35,11 @@ func (r *InstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *InstanceReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
+	bld := ctrl.NewControllerManagedBy(mgr).
 		For(&v1alpha1.Instance{}).
-		Named("instance").
-		Complete(r)
+		Named("instance")
+	if r.Events != nil {
+		bld.WatchesRawSource(source.Channel(r.Events, &handler.EnqueueRequestForObject{}))
+	}
+	return bld.Complete(r)
 }
