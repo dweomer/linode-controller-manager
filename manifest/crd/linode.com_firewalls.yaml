@@ -1,0 +1,314 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.1
+  name: firewalls.linode.com
+spec:
+  group: linode.com
+  names:
+    categories:
+    - linode
+    kind: Firewall
+    listKind: FirewallList
+    plural: firewalls
+    shortNames:
+    - lfw
+    singular: firewall
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Firewall ID
+      jsonPath: .spec.id
+      name: ID
+      type: integer
+    - description: Firewall Label
+      jsonPath: .spec.label
+      name: Label
+      type: string
+    - description: Firewall Status
+      jsonPath: .status.status
+      name: Status
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          Firewall is the Schema for the firewalls API.
+          CREATE: https://techdocs.akamai.com/linode-api/reference/post-firewalls
+          UPDATE: https://techdocs.akamai.com/linode-api/reference/put-firewall
+          READ:   https://techdocs.akamai.com/linode-api/reference/get-firewall
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: FirewallSpec defines the desired state of a Firewall.
+            properties:
+              id:
+                format: int64
+                title: ID
+                type: integer
+              label:
+                maxLength: 32
+                minLength: 3
+                type: string
+              rules:
+                description: FirewallRules defines inbound and outbound rules with
+                  default policies.
+                properties:
+                  fingerprint:
+                    type: string
+                  inbound:
+                    items:
+                      description: FirewallRule defines a single inbound or outbound
+                        firewall rule.
+                      properties:
+                        action:
+                          description: FirewallPolicy represents the allowed values
+                            for firewall rule actions and default policies.
+                          enum:
+                          - ACCEPT
+                          - DROP
+                          type: string
+                        addresses:
+                          properties:
+                            ipv4:
+                              items:
+                                type: string
+                              title: IPv4
+                              type: array
+                              x-kubernetes-list-type: atomic
+                            ipv6:
+                              items:
+                                type: string
+                              title: IPv6
+                              type: array
+                              x-kubernetes-list-type: atomic
+                          type: object
+                          x-kubernetes-map-type: atomic
+                        description:
+                          type: string
+                        label:
+                          maxLength: 32
+                          minLength: 1
+                          type: string
+                        ports:
+                          description: Comma-separated list of ports or port ranges
+                            (e.g. "22,80,443,8000-9000").
+                          type: string
+                        protocol:
+                          description: FirewallProtocol represents the allowed values
+                            for firewall rule protocols.
+                          enum:
+                          - TCP
+                          - UDP
+                          - ICMP
+                          - IPENCAP
+                          type: string
+                      required:
+                      - action
+                      - addresses
+                      - protocol
+                      type: object
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  inboundPolicy:
+                    description: FirewallPolicy represents the allowed values for
+                      firewall rule actions and default policies.
+                    enum:
+                    - ACCEPT
+                    - DROP
+                    type: string
+                  outbound:
+                    items:
+                      description: FirewallRule defines a single inbound or outbound
+                        firewall rule.
+                      properties:
+                        action:
+                          description: FirewallPolicy represents the allowed values
+                            for firewall rule actions and default policies.
+                          enum:
+                          - ACCEPT
+                          - DROP
+                          type: string
+                        addresses:
+                          properties:
+                            ipv4:
+                              items:
+                                type: string
+                              title: IPv4
+                              type: array
+                              x-kubernetes-list-type: atomic
+                            ipv6:
+                              items:
+                                type: string
+                              title: IPv6
+                              type: array
+                              x-kubernetes-list-type: atomic
+                          type: object
+                          x-kubernetes-map-type: atomic
+                        description:
+                          type: string
+                        label:
+                          maxLength: 32
+                          minLength: 1
+                          type: string
+                        ports:
+                          description: Comma-separated list of ports or port ranges
+                            (e.g. "22,80,443,8000-9000").
+                          type: string
+                        protocol:
+                          description: FirewallProtocol represents the allowed values
+                            for firewall rule protocols.
+                          enum:
+                          - TCP
+                          - UDP
+                          - ICMP
+                          - IPENCAP
+                          type: string
+                      required:
+                      - action
+                      - addresses
+                      - protocol
+                      type: object
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  outboundPolicy:
+                    description: FirewallPolicy represents the allowed values for
+                      firewall rule actions and default policies.
+                    enum:
+                    - ACCEPT
+                    - DROP
+                    type: string
+                required:
+                - inboundPolicy
+                - outboundPolicy
+                type: object
+              tags:
+                items:
+                  type: string
+                type: array
+                x-kubernetes-list-type: set
+            required:
+            - label
+            - rules
+            type: object
+          status:
+            description: FirewallStatus defines the observed state of a Firewall.
+            properties:
+              conditions:
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              created:
+                format: date-time
+                type: string
+              entities:
+                items:
+                  description: FirewallEntity is a read-only reference to a resource
+                    attached to the Firewall.
+                  properties:
+                    id:
+                      format: int64
+                      title: ID
+                      type: integer
+                    label:
+                      type: string
+                    type:
+                      type: string
+                  type: object
+                type: array
+                x-kubernetes-list-type: atomic
+              status:
+                description: FirewallStatusType represents the allowed status values
+                  for a Firewall.
+                enum:
+                - enabled
+                - disabled
+                - deleted
+                type: string
+              updated:
+                format: date-time
+                type: string
+            type: object
+        required:
+        - spec
+        type: object
+    selectableFields:
+    - jsonPath: .spec.id
+    - jsonPath: .spec.label
+    served: true
+    storage: true
+    subresources:
+      status: {}

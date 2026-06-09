@@ -113,6 +113,7 @@ spec:
                 x-kubernetes-list-type: set
               backupID:
                 format: int64
+                title: Backup ID
                 type: integer
               backupSchedule:
                 properties:
@@ -135,11 +136,13 @@ spec:
                 type: string
               firewallID:
                 format: int64
+                title: Firewall ID
                 type: integer
               group:
                 type: string
               id:
                 format: int64
+                title: ID
                 type: integer
               image:
                 type: string
@@ -148,10 +151,173 @@ spec:
                   for interface_generation
                 type: string
               interfaces:
-                type: object
+                description: |-
+                  InstanceInterfaces is a polymorphic list of network interfaces for an Instance.
+                  The valid shape depends on the parent Instance's interfaceGeneration:
+                    - "linode": each entry uses exactly one of Public, VPC, or VLAN
+                    - "legacy_config": each entry uses Purpose with the legacy flat fields
+                items:
+                  description: |-
+                    Interface represents a single network interface.
+                    For linode-gen: set exactly one of Public, VPC, or VLAN.
+                    For legacy-gen: set Purpose and the corresponding flat fields.
+                  properties:
+                    defaultRoute:
+                      description: InterfaceDefaultRoute
+                      properties:
+                        ipv4:
+                          title: IPv4
+                          type: boolean
+                        ipv6:
+                          title: IPv6
+                          type: boolean
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    firewallID:
+                      format: int64
+                      title: Firewall ID
+                      type: integer
+                    ipRanges:
+                      description: Legacy VPC IP ranges routed to this interface.
+                      items:
+                        type: string
+                      title: IP Ranges
+                      type: array
+                      x-kubernetes-list-type: set
+                    ipamAddress:
+                      description: VLAN IPAM address in CIDR notation. Only for purpose
+                        "vlan".
+                      title: IPAM Address
+                      type: string
+                    ipv4:
+                      description: Legacy VPC IPv4 configuration.
+                      properties:
+                        nat:
+                          description: |-
+                            Bidirectional NAT mapping between this VPC address and a public IPv4.
+                            A specific address or "any".
+                          title: NAT
+                          type: string
+                        vpc:
+                          description: VPC subnet IPv4 address.
+                          title: VPC
+                          type: string
+                      title: IPv4
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    label:
+                      description: VLAN label. Required when purpose is "vlan".
+                      maxLength: 64
+                      pattern: '[a-zA-Z0-9-]+'
+                      type: string
+                    primary:
+                      type: boolean
+                    public:
+                      properties:
+                        ipv4:
+                          properties:
+                            addresses:
+                              items:
+                                properties:
+                                  address:
+                                    description: '"auto" or a specific IPv4 address.'
+                                    type: string
+                                  primary:
+                                    type: boolean
+                                type: object
+                              type: array
+                              x-kubernetes-list-type: atomic
+                          title: IPv4
+                          type: object
+                        ipv6:
+                          properties:
+                            ranges:
+                              items:
+                                properties:
+                                  range:
+                                    type: string
+                                type: object
+                              type: array
+                              x-kubernetes-list-type: atomic
+                          title: IPv6
+                          type: object
+                      type: object
+                    purpose:
+                      description: InterfacePurpose represents the allowed values
+                        for a legacy config interface purpose.
+                      enum:
+                      - public
+                      - vlan
+                      - vpc
+                      type: string
+                    subnetID:
+                      description: VPC subnet ID. Required when purpose is "vpc" (legacy).
+                      format: int64
+                      title: Subnet ID
+                      type: integer
+                    vlan:
+                      properties:
+                        ipamAddress:
+                          title: IPAM Address
+                          type: string
+                        label:
+                          maxLength: 64
+                          minLength: 1
+                          pattern: '[a-zA-Z0-9-]+'
+                          type: string
+                      required:
+                      - label
+                      title: VLAN
+                      type: object
+                    vpc:
+                      properties:
+                        ipv4:
+                          properties:
+                            addresses:
+                              items:
+                                properties:
+                                  address:
+                                    description: '"auto" or a specific VPC subnet
+                                      IPv4 address.'
+                                    type: string
+                                  nat:
+                                    description: |-
+                                      Bidirectional NAT mapping between this VPC address and a public IPv4.
+                                      "auto", a specific public IPv4, or omit for no NAT.
+                                    title: NAT
+                                    type: string
+                                  primary:
+                                    type: boolean
+                                type: object
+                              type: array
+                              x-kubernetes-list-type: atomic
+                            ranges:
+                              items:
+                                properties:
+                                  range:
+                                    description: CIDR notation or prefix only (e.g.
+                                      "10.0.0.0/28" or "/28").
+                                    type: string
+                                type: object
+                              type: array
+                              x-kubernetes-list-type: atomic
+                          title: IPv4
+                          type: object
+                        subnetID:
+                          format: int64
+                          title: Subnet ID
+                          type: integer
+                      required:
+                      - subnetID
+                      title: VPC
+                      type: object
+                  type: object
+                type: array
+                x-kubernetes-list-type: atomic
               ipv4:
                 items:
                   type: string
+                title: IPv4
                 type: array
                 x-kubernetes-list-type: set
               kernel:
@@ -161,7 +327,6 @@ spec:
                 minLength: 3
                 type: string
               locks:
-                description: v4beta only
                 items:
                   description: InstanceLockType represents the allowed lock types
                     (v4beta only)
@@ -203,6 +368,7 @@ spec:
                     type: string
                 type: object
               privateIP:
+                title: Private IP
                 type: boolean
               region:
                 type: string
@@ -219,6 +385,7 @@ spec:
                 type: string
               stackscriptID:
                 format: int64
+                title: Stackscript ID
                 type: integer
               swapSize:
                 format: int64
@@ -323,6 +490,7 @@ spec:
               hasUserData:
                 type: boolean
               hostUUID:
+                title: Host UUID
                 type: string
               hypervisor:
                 type: string
@@ -340,23 +508,22 @@ spec:
                 type: integer
               specs:
                 properties:
-                  acceleratedDevices:
-                    format: int32
-                    type: integer
                   disk:
-                    format: int32
+                    format: int64
                     type: integer
                   gpus:
-                    format: int32
+                    format: int64
+                    title: GPUs
                     type: integer
                   memory:
-                    format: int32
+                    format: int64
                     type: integer
                   transfer:
-                    format: int32
+                    format: int64
                     type: integer
                   vcpus:
-                    format: int32
+                    format: int64
+                    title: VCPUs
                     type: integer
                 type: object
               status:
