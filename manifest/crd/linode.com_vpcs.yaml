@@ -14,7 +14,7 @@ spec:
     listKind: VPCList
     plural: vpcs
     shortNames:
-    - lvpc
+    - linvpc
     singular: vpc
   scope: Namespaced
   versions:

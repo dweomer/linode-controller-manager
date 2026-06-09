@@ -76,7 +76,7 @@ type FirewallStatus struct {
 
 	// +listType=atomic
 	// +k8s:optional
-	Entities []FirewallEntity `json:"entities,omitzero" linode:"entities" api:"readonly"`
+	Entities []Entity `json:"entities,omitzero" linode:"entities" api:"readonly"`
 
 	// +listType=map
 	// +listMapKey=type

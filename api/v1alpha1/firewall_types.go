@@ -62,11 +62,3 @@ type FirewallAddresses struct {
 	IPv6 []string `json:"ipv6,omitzero" linode:"ipv6"`
 }
 
-// FirewallEntity is a read-only reference to a resource attached to the Firewall.
-type FirewallEntity struct {
-	// +kubebuilder:title:="ID"
-	ID int64 `json:"id,omitzero" linode:"id"`
-
-	Type  string `json:"type,omitzero" linode:"type"`
-	Label string `json:"label,omitzero" linode:"label"`
-}

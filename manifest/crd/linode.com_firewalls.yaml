@@ -14,7 +14,7 @@ spec:
     listKind: FirewallList
     plural: firewalls
     shortNames:
-    - lfw
+    - linfw
     singular: firewall
   scope: Namespaced
   versions:
@@ -87,6 +87,7 @@ spec:
                           - DROP
                           type: string
                         addresses:
+                          description: FirewallAddresses
                           properties:
                             ipv4:
                               items:
@@ -148,6 +149,7 @@ spec:
                           - DROP
                           type: string
                         addresses:
+                          description: FirewallAddresses
                           properties:
                             ipv4:
                               items:
@@ -276,8 +278,7 @@ spec:
                 type: string
               entities:
                 items:
-                  description: FirewallEntity is a read-only reference to a resource
-                    attached to the Firewall.
+                  description: Entity is a reference to a Linode API resource.
                   properties:
                     id:
                       format: int64
@@ -285,9 +286,16 @@ spec:
                       type: integer
                     label:
                       type: string
+                    parentEntity: {}
                     type:
+                      description: EntityType represents the type of a Linode API
+                        entity.
+                      type: string
+                    url:
+                      title: URL
                       type: string
                   type: object
+                  x-kubernetes-map-type: atomic
                 type: array
                 x-kubernetes-list-type: atomic
               status:
