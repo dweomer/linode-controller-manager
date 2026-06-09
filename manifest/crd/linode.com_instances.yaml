@@ -1,0 +1,384 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.1
+  name: instances.linode.com
+spec:
+  group: linode.com
+  names:
+    categories:
+    - linode
+    kind: Instance
+    listKind: InstanceList
+    plural: instances
+    shortNames:
+    - li
+    - lin
+    - linodes
+    singular: instance
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Instance ID
+      jsonPath: .spec.id
+      name: ID
+      type: integer
+    - description: Instance Label
+      jsonPath: .spec.label
+      name: Label
+      type: string
+    - description: Linode Region
+      jsonPath: .spec.region
+      name: Region
+      type: string
+    - description: Linode Group
+      jsonPath: .spec.group
+      name: Group
+      priority: 9
+      type: string
+    - description: Interface Generation
+      jsonPath: .spec.interfaceGeneration
+      name: Generation
+      priority: 1
+      type: string
+    - description: Linode Type
+      jsonPath: .spec.type
+      name: Type
+      priority: 1
+      type: string
+    - description: Placement Group Label
+      jsonPath: .spec.placementGroup.label
+      name: Placement
+      priority: 1
+      type: string
+    - description: Linode Status
+      jsonPath: .status.status
+      name: Status
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Instance is the Schema for the instances API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: spec defines the desired state of Instance
+            properties:
+              alerts:
+                properties:
+                  cpu:
+                    format: int64
+                    type: integer
+                  io:
+                    format: int64
+                    type: integer
+                  networkIn:
+                    format: int64
+                    type: integer
+                  networkOut:
+                    format: int64
+                    type: integer
+                  transferQuota:
+                    format: int64
+                    type: integer
+                type: object
+                x-kubernetes-map-type: atomic
+              authorizedKeys:
+                items:
+                  type: string
+                type: array
+                x-kubernetes-list-type: set
+              authorizedUsers:
+                items:
+                  type: string
+                type: array
+                x-kubernetes-list-type: set
+              backupID:
+                format: int64
+                type: integer
+              backupSchedule:
+                properties:
+                  day:
+                    type: string
+                  window:
+                    type: string
+                type: object
+              backupsEnabled:
+                type: boolean
+              bootSize:
+                type: integer
+              booted:
+                default: true
+                type: boolean
+              diskEncryption:
+                default: enabled
+                description: InstanceDiskEncryption represents the allowed values
+                  for disk_encryption
+                type: string
+              firewallID:
+                format: int64
+                type: integer
+              group:
+                type: string
+              id:
+                format: int64
+                type: integer
+              image:
+                type: string
+              interfaceGeneration:
+                description: InstanceInterfaceGeneration represents the allowed types
+                  for interface_generation
+                type: string
+              interfaces:
+                type: object
+              ipv4:
+                items:
+                  type: string
+                type: array
+                x-kubernetes-list-type: set
+              kernel:
+                type: string
+              label:
+                maxLength: 64
+                minLength: 3
+                type: string
+              locks:
+                description: v4beta only
+                items:
+                  description: InstanceLockType represents the allowed lock types
+                    (v4beta only)
+                  type: string
+                type: array
+                x-kubernetes-list-type: set
+              maintenancePolicy:
+                default: linode/power_off_on
+                description: InstanceMaintenancePolicy represents the allowed values
+                  for maintenance_policy
+                type: string
+              metadata:
+                properties:
+                  userData:
+                    type: string
+                type: object
+              networkHelper:
+                type: boolean
+              placementGroup:
+                properties:
+                  compliantOnly:
+                    type: boolean
+                  id:
+                    format: int64
+                    type: integer
+                  label:
+                    minLength: 1
+                    type: string
+                  migratingTo:
+                    format: int64
+                    type: integer
+                  policy:
+                    description: InstancePlacementGroupPolicy represents the allowed
+                      types for placement_group.policy
+                    type: string
+                  type:
+                    description: InstancePlacementGroupType represents the allowed
+                      types for placement_group.type
+                    type: string
+                type: object
+              privateIP:
+                type: boolean
+              region:
+                type: string
+              rootPassword:
+                maxLength: 128
+                minLength: 7
+                type: string
+              stackscriptData:
+                description: |-
+                  RawMessage is a raw encoded JSON value.
+                  It implements [Marshaler] and [Unmarshaler] and can
+                  be used to delay JSON decoding or precompute a JSON encoding.
+                format: byte
+                type: string
+              stackscriptID:
+                format: int64
+                type: integer
+              swapSize:
+                format: int64
+                type: integer
+              tags:
+                items:
+                  type: string
+                type: array
+                x-kubernetes-list-type: set
+              type:
+                type: string
+              watchdogEnabled:
+                type: boolean
+            type: object
+          status:
+            description: status defines the observed state of Instance
+            properties:
+              backups:
+                properties:
+                  available:
+                    type: boolean
+                  enabled:
+                    type: boolean
+                  lastSuccessful:
+                    format: date-time
+                    type: string
+                  schedule:
+                    properties:
+                      day:
+                        type: string
+                      window:
+                        type: string
+                    type: object
+                type: object
+              capabilities:
+                items:
+                  type: string
+                type: array
+                x-kubernetes-list-type: set
+              conditions:
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              created:
+                format: date-time
+                type: string
+              hasUserData:
+                type: boolean
+              hostUUID:
+                type: string
+              hypervisor:
+                type: string
+              ipv4:
+                items:
+                  type: string
+                title: IPv4
+                type: array
+              ipv6:
+                title: IPv6
+                type: string
+              lkeClusterID:
+                format: int64
+                title: LKE Cluster ID
+                type: integer
+              specs:
+                properties:
+                  acceleratedDevices:
+                    format: int32
+                    type: integer
+                  disk:
+                    format: int32
+                    type: integer
+                  gpus:
+                    format: int32
+                    type: integer
+                  memory:
+                    format: int32
+                    type: integer
+                  transfer:
+                    format: int32
+                    type: integer
+                  vcpus:
+                    format: int32
+                    type: integer
+                type: object
+              status:
+                description: InstanceStatusType represents the allowed types for status
+                type: string
+              updated:
+                format: date-time
+                type: string
+            type: object
+        required:
+        - spec
+        type: object
+    selectableFields:
+    - jsonPath: .spec.id
+    - jsonPath: .spec.label
+    - jsonPath: .spec.region
+    - jsonPath: .spec.group
+    - jsonPath: .spec.interfaceGeneration
+    - jsonPath: .spec.placementGroup.id
+    - jsonPath: .spec.placementGroup.label
+    - jsonPath: .spec.placementGroup.type
+    served: true
+    storage: true
+    subresources:
+      status: {}

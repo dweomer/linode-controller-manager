@@ -1,0 +1,21 @@
+# kubectl create --filename=manifest/example/instance/44444.yaml --validate=warn
+apiVersion: linode.com/v1alpha1
+kind: Instance
+metadata:
+  name: five-fours
+  labels:
+    example/instance: "44444"
+spec:
+  id: 44444
+  image: 'linode/example:44444'
+  interfaces: {}
+  label: 5-fours
+  region: us-west
+  rootPassword: password
+  tags: [ example, "44444" ]
+  type: g6-standard-8
+# kubectl edit --filename=example/instance/44444.yaml --subresource=status
+status:
+  ipv4:
+    - "4.4.4.4/4"
+  status: "provisioning"
