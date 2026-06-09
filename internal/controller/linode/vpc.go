@@ -13,29 +13,29 @@ import (
 	"github.com/dweomer/linode-controller-manager/api/v1alpha1"
 )
 
-// InstanceReconciler reconciles an Instance object
-type InstanceReconciler struct {
+// VPCReconciler reconciles a VPC object
+type VPCReconciler struct {
 	client.Client
 	Events <-chan event.GenericEvent
 }
 
-// +kubebuilder:rbac:groups=linode.com,namespace=linode-system,resources=instances,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=linode.com,namespace=linode-system,resources=instances/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=linode.com,namespace=linode-system,resources=instances/finalizers,verbs=update
+// +kubebuilder:rbac:groups=linode.com,namespace=linode-system,resources=vpcs,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=linode.com,namespace=linode-system,resources=vpcs/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=linode.com,namespace=linode-system,resources=vpcs/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
-func (r *InstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *VPCReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = logf.FromContext(ctx)
 	_ = r.Get(nil, req.NamespacedName, nil)
 	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *InstanceReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *VPCReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	bld := ctrl.NewControllerManagedBy(mgr).
-		For(&v1alpha1.Instance{}).
-		Named("instance")
+		For(&v1alpha1.VPC{}).
+		Named("vpc")
 	if r.Events != nil {
 		bld.WatchesRawSource(source.Channel(r.Events, &handler.EnqueueRequestForObject{}))
 	}

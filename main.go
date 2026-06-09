@@ -209,12 +209,24 @@ func main() {
 
 	if err := (&linode.InstanceReconciler{
 		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "Failed to create controller", "controller", "linode-instance")
 		os.Exit(1)
 	}
-	// +kubebuilder:scaffold:builder
+
+	if err := (&linode.FirewallReconciler{
+		Client: mgr.GetClient(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "Failed to create controller", "controller", "linode-firewall")
+		os.Exit(1)
+	}
+
+	if err := (&linode.VPCReconciler{
+		Client: mgr.GetClient(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "Failed to create controller", "controller", "linode-vpc")
+		os.Exit(1)
+	}
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "Failed to set up health check")

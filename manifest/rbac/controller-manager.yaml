@@ -15,7 +15,9 @@ rules:
 - apiGroups:
   - linode.com
   resources:
+  - firewalls
   - instances
+  - vpcs
   verbs:
   - create
   - delete
@@ -27,13 +29,17 @@ rules:
 - apiGroups:
   - linode.com
   resources:
+  - firewalls/finalizers
   - instances/finalizers
+  - vpcs/finalizers
   verbs:
   - update
 - apiGroups:
   - linode.com
   resources:
+  - firewalls/status
   - instances/status
+  - vpcs/status
   verbs:
   - get
   - patch
