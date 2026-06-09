@@ -40,10 +40,11 @@ type InstancePlacementGroup struct {
 }
 
 type InstanceSpecs struct {
-	Disk               int32 `json:"disk,omitzero" linode:"disk" api:"readonly"`
-	GPUs               int32 `json:"gpus,omitzero" linode:"gpus" api:"readonly"`
-	Memory             int32 `json:"memory,omitzero" linode:"memory" api:"readonly"`
-	Transfer           int32 `json:"transfer,omitzero" linode:"transfer" api:"readonly"`
-	VCPUs              int32 `json:"vcpus,omitzero" linode:"vcpus" api:"readonly"`
-	AcceleratedDevices int32 `json:"acceleratedDevices,omitzero" linode:"accelerated_devices" api:"readonly"`
+	Disk int64 `json:"disk,omitzero" linode:"disk" api:"readonly"`
+	// +kubebuilder:title:="GPUs"
+	GPUs     int64 `json:"gpus,omitzero" linode:"gpus" api:"readonly"`
+	Memory   int64 `json:"memory,omitzero" linode:"memory" api:"readonly"`
+	Transfer int64 `json:"transfer,omitzero" linode:"transfer" api:"readonly"`
+	// +kubebuilder:title:="VCPUs"
+	VCPUs int64 `json:"vcpus,omitzero" linode:"vcpus" api:"readonly"`
 }

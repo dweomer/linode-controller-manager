@@ -61,6 +61,7 @@ func init() {
 // UPDATE: https://techdocs.akamai.com/linode-api/reference/put-linode-instance
 // READ:   https://techdocs.akamai.com/linode-api/reference/get-linode-instance
 type InstanceSpec struct {
+	// +kubebuilder:title:="ID"
 	// +k8s:optional
 	ID int64 `json:"id,omitzero" linode:"id" api:"readonly,filterable,status"`
 
@@ -113,16 +114,19 @@ type InstanceSpec struct {
 	// +default:value="linode/power_off_on"
 	MaintenancePolicy InstanceMaintenancePolicy `json:"maintenancePolicy,omitzero" linode:"maintenance_policy" default:"linode/power_off_on" api:"status"`
 
+	// +kubebuilder:title:="Stackscript ID"
 	// +k8s:optional
 	StackscriptID int64 `json:"stackscriptID,omitzero" linode:"stackscript_id" api:"writeonly"`
 	// +k8s:optional
 	StackscriptData json.RawMessage `json:"stackscriptData,omitzero" linode:"stackscript_data" api:"writeonly"`
 
+	// +kubebuilder:title:="Backup ID"
 	// +k8s:optional
 	BackupID int64 `json:"backupID,omitzero" linode:"backup_id" api:"writeonly"`
 	// +k8s:optional
 	BackupsEnabled *bool `json:"backupsEnabled,omitzero" linode:"backups_enabled" api:"writeonly"`
 
+	// +kubebuilder:title:="Firewall ID"
 	// +k8s:optional
 	FirewallID int64 `json:"firewallID,omitzero" linode:"firewall_id" api:"writeonly"`
 
@@ -138,6 +142,7 @@ type InstanceSpec struct {
 	// +k8s:optional
 	PlacementGroup InstancePlacementGroup `json:"placementGroup,omitzero" linode:"placement_group" api:"status"`
 
+	// +kubebuilder:title:="Private IP"
 	// +k8s:optional
 	// +default:value:=false
 	PrivateIP bool `json:"privateIP,omitzero" linode:"private_ip" api:"writeonly"`
@@ -152,6 +157,7 @@ type InstanceSpec struct {
 	// +k8s:optional
 	BootSize *int `json:"bootSize,omitzero" linode:"boot_size" api:"writeonly"`
 
+	// +kubebuilder:title:="IPv4"
 	// +listType=set
 	// +k8s:optional
 	IPv4 []string `json:"ipv4,omitzero" linode:"ipv4" api:"writeonly"`
@@ -189,6 +195,7 @@ type InstanceStatus struct {
 	// +k8s:optional
 	HasUserData bool `json:"hasUserData,omitzero" linode:"has_user_data" api:"readonly,status"`
 
+	// +kubebuilder:title:="Host UUID"
 	// +k8s:optional
 	HostUUID string `json:"hostUUID,omitzero" linode:"host_uuid" api:"readonly,status"`
 
