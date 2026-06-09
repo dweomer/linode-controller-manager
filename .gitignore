@@ -32,3 +32,6 @@ go.work
 # Local cache (API specs, etc.)
 .cache/
 .claude/settings.local.json
+
+linode-controller-manager
+main

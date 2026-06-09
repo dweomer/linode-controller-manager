@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/linode/linodego/v2"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -24,7 +27,6 @@ import (
 
 	"github.com/dweomer/linode-controller-manager/api/v1alpha1"
 	"github.com/dweomer/linode-controller-manager/internal/controller/linode"
-	// +kubebuilder:scaffold:imports
 )
 
 var (
@@ -183,7 +185,7 @@ func main() {
 		WebhookServer:          webhookServer,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "e7d63ca6.dweomer.io",
+		LeaderElectionID:       "e7d63ca6.linode.com",
 		// LeaderElectionReleaseOnCancel defines if the leader should step down voluntarily
 		// when the Manager ends. This requires the binary to immediately end when the
 		// Manager is stopped, otherwise, this setting is unsafe. Setting this significantly
@@ -207,23 +209,41 @@ func main() {
 		os.Exit(1)
 	}
 
+	var apiClient linode.AtomicClient
+
+	if err = linode.NewReconciler(mgr.GetClient(), &apiClient).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "Failed to create controller", "controller", "linode-api")
+		os.Exit(1)
+	}
+
+	poller := linode.NewEventPoller(
+		mgr.GetClient(), &apiClient,
+		mgr.GetEventRecorder("linode-api"),
+		time.Minute,
+		podNamespace(),
+	)
+	if err := poller.SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "Failed to set up event poller")
+		os.Exit(1)
+	}
+
 	if err := (&linode.InstanceReconciler{
-		Client: mgr.GetClient(),
-	}).SetupWithManager(mgr); err != nil {
+		Events: poller.Channel(linodego.EntityLinode),
+	}).SetupWithManager(mgr, &apiClient); err != nil {
 		setupLog.Error(err, "Failed to create controller", "controller", "linode-instance")
 		os.Exit(1)
 	}
 
 	if err := (&linode.FirewallReconciler{
-		Client: mgr.GetClient(),
-	}).SetupWithManager(mgr); err != nil {
+		Events: poller.Channel(linodego.EntityFirewall),
+	}).SetupWithManager(mgr, &apiClient); err != nil {
 		setupLog.Error(err, "Failed to create controller", "controller", "linode-firewall")
 		os.Exit(1)
 	}
 
 	if err := (&linode.VPCReconciler{
-		Client: mgr.GetClient(),
-	}).SetupWithManager(mgr); err != nil {
+		Events: poller.Channel(linodego.EntityVPC),
+	}).SetupWithManager(mgr, &apiClient); err != nil {
 		setupLog.Error(err, "Failed to create controller", "controller", "linode-vpc")
 		os.Exit(1)
 	}
@@ -242,4 +262,12 @@ func main() {
 		setupLog.Error(err, "Failed to run manager")
 		os.Exit(1)
 	}
+}
+
+func podNamespace() string {
+	ns, err := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+	if err != nil {
+		return "default"
+	}
+	return strings.TrimSpace(string(ns))
 }

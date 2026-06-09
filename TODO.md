@@ -18,5 +18,13 @@ Verified Instance CRD against cached OpenAPI spec (`.cache/openapi.json`). Locks
 > The PUT body in the OpenAPI spec may share the response schema, making fields _appear_ writable when they're actually
 > read-only in the response. Test with actual PUT requests if uncertain.
 
-## Remove the redundant Scheme from all reconciler structs.
+## Token Management / Auth Model
 
+Current: single admin PAT in a Secret in the controller namespace, shared across all reconcilers and the event poller.
+
+- [ ] **Read-only event poller token** — At startup, if the admin token has sufficient privileges, create a scoped
+  read-only token for the event poller instead of sharing the admin PAT.
+- [ ] **Per-user token delegation** — Controller could create limited-duration tokens for child users of the Linode
+  account, rotating as necessary.
+- [ ] **One connection per namespace** — The controller is namespace-scoped; each watched namespace should have its own
+  Linode API connection sourced from a Secret in that namespace.
